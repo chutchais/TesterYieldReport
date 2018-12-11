@@ -4,10 +4,13 @@ Imports TesterYieldReport.clsReport
 
 
 Public Class frmMain
-    Dim objEPROs As New List(Of clsEPRO)
+
     Dim objReport As New clsReport
+    Dim objFiles As New List(Of Object)
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+
         'Select Tester type EPRO 
         cbTesterType.SelectedIndex = 0
 
@@ -17,7 +20,7 @@ Public Class frmMain
             .AllowColumnReorder = True
             .FullRowSelect = True
             .AllowDrop = True
-            .Columns.Add("File name", 100, HorizontalAlignment.Left)
+            .Columns.Add("File name", 200, HorizontalAlignment.Left)
             .Columns.Add("Tested", 50, HorizontalAlignment.Right)
             .Columns.Add("Passed", 50, HorizontalAlignment.Right)
             .Columns.Add("Failed", 50, HorizontalAlignment.Right)
@@ -30,7 +33,7 @@ Public Class frmMain
             .View = View.Details
             .AllowColumnReorder = True
             .FullRowSelect = True
-            .Columns.Add("Lot number", 100, HorizontalAlignment.Left)
+            .Columns.Add("Lot number", 150, HorizontalAlignment.Left)
             .Columns.Add("file(s)", 50, HorizontalAlignment.Center)
             .Columns.Add("Tested", 50, HorizontalAlignment.Right)
             .Columns.Add("Passed", 50, HorizontalAlignment.Right)
@@ -50,30 +53,54 @@ Public Class frmMain
         Dim vShortFileName As String
         vShortFileName = My.Computer.FileSystem.GetFileInfo(vFileName).Name
 
-        Dim selectedValue As clsEPRO
-        selectedValue = objEPROs.Find(Function(EPRO) EPRO.keyName = vShortFileName)
 
-        If Not selectedValue Is Nothing Then
+        Dim founditem As ListViewItem = ListView1.FindItemWithText(vShortFileName)
+
+        If Not founditem Is Nothing Then
+            Me.Cursor = Cursors.Default
             MsgBox("File " & vShortFileName & " already exist in list", MsgBoxStyle.Exclamation,
                     "File already exist")
+
             Exit Sub
         End If
 
         Dim vSuccessFile As Integer = 0
         Dim vErrorFile As Integer = 0
 
-        ' Do work, example
-        Dim objEpro As New clsEPRO(vFileName)
-        'ListBox1.Items.Add(file.Name & ":" & objEpro.message)
+        ' Start here
+        Dim vFileExt As String = "*.txt"
+        Select Case cbTesterType.SelectedItem
+            Case "EPRO" : vFileExt = "*.sum"
+            Case "ETS" : vFileExt = "*.txt"
+        End Select
+
+        If Not vShortFileName Like vFileExt Then
+            Me.Cursor = Cursors.Default
+            MsgBox("File " & vShortFileName & " is wrong format", MsgBoxStyle.Exclamation,
+                    "File is wrong format")
+
+            Exit Sub
+        End If
+
+
+
+
+        'Dim objEpro As New clsEPRO(vFileName)
+        Dim objFile As New Object
+        Select Case cbTesterType.SelectedItem
+            Case "EPRO" : objFile = New clsEPRO(vFileName)
+            Case "ETS" : objFile = New clsETS(vFileName)
+        End Select
+
 
         Dim newItem As ListViewItem = New ListViewItem(vShortFileName)
 
-        If objEpro.completed Then
+        If objFile.completed Then
             vSuccessFile = vSuccessFile + 1
-            newItem.SubItems.Add(objEpro.Tested)
-            newItem.SubItems.Add(objEpro.Passed)
-            newItem.SubItems.Add(objEpro.Failed)
-            newItem.SubItems.Add(Format(objEpro.Yield, "0.00"))
+            newItem.SubItems.Add(objFile.Tested)
+            newItem.SubItems.Add(objFile.Passed)
+            newItem.SubItems.Add(objFile.Failed)
+            newItem.SubItems.Add(Format(objFile.Yield, "0.00"))
 
 
         Else
@@ -83,15 +110,15 @@ Public Class frmMain
             newItem.SubItems.Add("")
             newItem.SubItems.Add("")
         End If
-        newItem.SubItems.Add(objEpro.message)
+        newItem.SubItems.Add(objFile.message)
 
 
         ListView1.Items.Add(newItem)
-        objEPROs.Add(objEpro)
+        'objEPROs.Add(objEpro)
+        objFiles.Add(objFile)
 
 
-
-        ToolStripStatusLabel1.Text = "Total " & objEPROs.Count.ToString & " file(s) "
+        ToolStripStatusLabel1.Text = "Total " & objFiles.Count.ToString & " file(s) "
         Me.Cursor = Cursors.Default
     End Sub
 
@@ -101,7 +128,7 @@ Public Class frmMain
             .Tested = 0
             .Passed = 0
             .Failed = 0
-            For Each iepro In objEPROs
+            For Each iepro In objFiles 'objEPROs
                 .Tested = .Tested + iepro.Tested
                 .Passed = .Passed + iepro.Passed
                 .Failed = .Failed + iepro.Failed
@@ -164,10 +191,20 @@ Public Class frmMain
     Sub generate_report_folder(vPath As String)
         Me.Cursor = Cursors.WaitCursor
 
-        objEPROs.Clear()
+        'objEPROs.Clear()
+        objFiles.Clear()
+
+        'Define file extension for each Tester type
+        Dim vFileExt As String = "*.txt"
+        Select Case cbTesterType.SelectedItem
+            Case "EPRO" : vFileExt = "*.sum"
+            Case "ETS" : vFileExt = "*.txt"
+        End Select
+
+
         Dim dinfo As New DirectoryInfo(vPath)
         'Get the files based on .txt extension
-        Dim files As FileInfo() = dinfo.GetFiles("*.sum")
+        Dim files As FileInfo() = dinfo.GetFiles(vFileExt)
 
 
 
@@ -176,17 +213,20 @@ Public Class frmMain
         Dim vErrorFile As Integer = 0
 
         For Each file As FileInfo In files
-            ' Do work, example
-            Dim objEpro As New clsEPRO(file.FullName)
-            'ListBox1.Items.Add(file.Name & ":" & objEpro.message)
+            Dim objFile As New Object
+            Select Case cbTesterType.SelectedItem
+                Case "EPRO" : objFile = New clsEPRO(file.FullName)
+                Case "ETS" : objFile = New clsETS(file.FullName)
+            End Select
+
             Dim newItem As ListViewItem = New ListViewItem(file.Name)
 
-            If objEpro.completed Then
+            If objFile.completed Then
                 vSuccessFile = vSuccessFile + 1
-                newItem.SubItems.Add(objEpro.Tested)
-                newItem.SubItems.Add(objEpro.Passed)
-                newItem.SubItems.Add(objEpro.Failed)
-                newItem.SubItems.Add(Format(objEpro.Yield, "0.00"))
+                newItem.SubItems.Add(objFile.Tested)
+                newItem.SubItems.Add(objFile.Passed)
+                newItem.SubItems.Add(objFile.Failed)
+                newItem.SubItems.Add(Format(objFile.Yield, "0.00"))
             Else
                 vErrorFile = vErrorFile + 1
                 newItem.SubItems.Add("")
@@ -194,17 +234,17 @@ Public Class frmMain
                 newItem.SubItems.Add("")
                 newItem.SubItems.Add("")
             End If
-            newItem.SubItems.Add(objEpro.message)
+            newItem.SubItems.Add(objFile.message)
 
 
             ListView1.Items.Add(newItem)
-            objEPROs.Add(objEpro)
+            objFiles.Add(objFile)
 
         Next
         'update summary report object
         summary_report_object()
         Me.Cursor = Cursors.Default
-        ToolStripStatusLabel1.Text = "Total " & objEPROs.Count.ToString & " file(s) " &
+        ToolStripStatusLabel1.Text = "Total " & objFiles.Count.ToString & " file(s) " &
             ",Successful " & vSuccessFile.ToString & " , Error " & vErrorFile.ToString & " file(s)"
     End Sub
 
@@ -212,14 +252,12 @@ Public Class frmMain
         If (FolderBrowserDialog1.ShowDialog() = DialogResult.OK) Then
             tbFolder.Text = FolderBrowserDialog1.SelectedPath
             generate_report_folder(FolderBrowserDialog1.SelectedPath)
-            'Properties.Settings.Default.LastSelectedFolder = FolderBrowserDialog1.SelectedPath.ToString()
-            'Properties.Settings.Default.Save()
         End If
     End Sub
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
         ListView1.Items.Clear()
-        objEPROs.Clear()
+        objFiles.Clear()
         summary_report_object()
         ToolStripStatusLabel1.Text = ""
         tssSummary.Text = ""
@@ -244,9 +282,6 @@ Public Class frmMain
                 For Each file In droppedObjects
                     generate_report_file(file)
                 Next
-
-
-
             Else
                 MsgBox("Invalid file or directory",
                        MsgBoxStyle.Critical, "Invalid file or directory")
@@ -281,11 +316,11 @@ Public Class frmMain
         For Each listItem As ListViewItem In ListView1.SelectedItems
             listItem.Remove()
             'remove from object list
-            objEPROs.RemoveAll(Function(objEPRO) objEPRO.keyName = listItem.Text)
+            objFiles.RemoveAll(Function(objFile) objFile.keyName = listItem.Text)
 
         Next
         summary_report_object()
-        ToolStripStatusLabel1.Text = "Total " & objEPROs.Count.ToString & " file(s) "
+        ToolStripStatusLabel1.Text = "Total " & objFiles.Count.ToString & " file(s) "
 
     End Sub
 
@@ -293,5 +328,9 @@ Public Class frmMain
         Me.Cursor = Cursors.WaitCursor
         objReport.ExportToExcel("d:\test_epro.xlsx")
         Me.Cursor = Cursors.Default
+    End Sub
+
+    Private Sub cbTesterType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbTesterType.SelectedIndexChanged
+        btnClear_Click(sender, e)
     End Sub
 End Class

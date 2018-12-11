@@ -17,14 +17,14 @@ Public Class clsReport
 
     Public Class Lot
 
-        Dim vFiles As New List(Of clsEPRO)
+        Dim vFiles As New List(Of Object) 'clsEPRO
 
         Public Property Name As String
         Public Property Tested As Integer
         Public Property Passed As Integer
         Public Property Failed As Integer
 
-        Public ReadOnly Property Files() As List(Of clsEPRO)
+        Public ReadOnly Property Files() As List(Of Object) 'clsEPRO
             Get
                 Return vFiles
             End Get
