@@ -10,7 +10,8 @@ Public Class frmMain
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-
+        'Dim vObjMAV As New clsMAV("C:\Users\Chutchai\Documents\8oclock\StartsMicro\projects\Tester Yield\Tester logs\MAV\S4UBH310057B_TS00182483.003_F1.txt")
+        'Dim vTable As DataTable = vObjMAV.convert_to_datatable
         'Select Tester type EPRO 
         cbTesterType.SelectedIndex = 0
 
@@ -72,6 +73,7 @@ Public Class frmMain
         Select Case cbTesterType.SelectedItem
             Case "EPRO" : vFileExt = "*.sum"
             Case "ETS" : vFileExt = "*.txt"
+            Case "MAV" : vFileExt = "*.txt"
         End Select
 
         If Not vShortFileName Like vFileExt Then
@@ -90,6 +92,7 @@ Public Class frmMain
         Select Case cbTesterType.SelectedItem
             Case "EPRO" : objFile = New clsEPRO(vFileName)
             Case "ETS" : objFile = New clsETS(vFileName)
+            Case "MAV" : objFile = New clsMAV(vFileName)
         End Select
 
 
@@ -199,6 +202,7 @@ Public Class frmMain
         Select Case cbTesterType.SelectedItem
             Case "EPRO" : vFileExt = "*.sum"
             Case "ETS" : vFileExt = "*.txt"
+            Case "MAV" : vFileExt = "*.txt"
         End Select
 
 
@@ -217,6 +221,7 @@ Public Class frmMain
             Select Case cbTesterType.SelectedItem
                 Case "EPRO" : objFile = New clsEPRO(file.FullName)
                 Case "ETS" : objFile = New clsETS(file.FullName)
+                Case "MAV" : objFile = New clsMAV(file.FullName)
             End Select
 
             Dim newItem As ListViewItem = New ListViewItem(file.Name)
@@ -326,7 +331,11 @@ Public Class frmMain
 
     Private Sub btnExport_Click(sender As Object, e As EventArgs) Handles btnExport.Click
         Me.Cursor = Cursors.WaitCursor
-        objReport.ExportToExcel("d:\test_epro.xlsx")
+        'Check folder report ,if No create new folder named "reports"
+        'If (Not System.IO.Directory.Exists("reports")) Then
+        '    System.IO.Directory.CreateDirectory("reports")
+        'End If
+        objReport.ExportToExcel("d:\" & cbTesterType.SelectedItem & "_summary.xlsx")
         Me.Cursor = Cursors.Default
     End Sub
 

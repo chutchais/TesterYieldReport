@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="clsEPRO.vb" />
     <Compile Include="clsETS.vb" />
+    <Compile Include="clsMAV.vb" />
     <Compile Include="clsReport.vb" />
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>

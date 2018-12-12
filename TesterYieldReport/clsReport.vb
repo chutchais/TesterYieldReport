@@ -100,6 +100,7 @@ Public Class clsReport
         wSheet.Columns.AutoFit()
         wBook.SaveAs(strFileName)
 
+
         ReleaseObject(wSheet)
         wBook.Close(False)
         ReleaseObject(wBook)

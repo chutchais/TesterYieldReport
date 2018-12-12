@@ -211,7 +211,7 @@ Partial Class frmMain
         'cbTesterType
         '
         Me.cbTesterType.FormattingEnabled = True
-        Me.cbTesterType.Items.AddRange(New Object() {"EPRO", "ETS"})
+        Me.cbTesterType.Items.AddRange(New Object() {"EPRO", "ETS", "MAV"})
         Me.cbTesterType.Location = New System.Drawing.Point(76, 25)
         Me.cbTesterType.Name = "cbTesterType"
         Me.cbTesterType.Size = New System.Drawing.Size(117, 21)
