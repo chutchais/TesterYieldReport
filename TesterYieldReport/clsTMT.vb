@@ -407,12 +407,18 @@ Public Class clsTMT
             ixColon = Array.FindIndex(strArray, Function(x) x.Contains(":"))
 
             Dim strAssyData As String = ""
-            strAssyData = strArray(ixColon + 1)
+            'strAssyData = IIf(strArray(ixColon + 1) <> "", strArray(ixColon + 1), strArray(ixColon + 2))
+            For i = ixColon + 1 To strArray.Length
+                If strArray(i) <> "" Then
+                    strAssyData = strArray(i)
+                    Exit For
+                End If
+            Next
             vAssyNumber = strAssyData.Split("_")(0)
             'vTestType = strFileName(0).Substring(0, 2) 'First 2 digits
             If strAssyData.Split("_").Length >= 3 Then
                 vLotNumber = strAssyData.Split("_")(1)
-                vSeqNumber = strAssyData.Split("_")(2).Substring(0, 2)
+                vSeqNumber = strAssyData.Split("_")(strAssyData.Split("_").Length - 1).Substring(0, 2)
             End If
             Exit Sub
         End If
@@ -557,7 +563,7 @@ Public Class clsTMT
 
 
                 'Add HW column
-                For i = 1 To hwbin_col_count
+                For i = 0 To hwbin_col_count
                     .Columns.Add("HW_Bin" & Str(i).Trim, GetType(String))
                 Next
 
@@ -613,10 +619,24 @@ Public Class clsTMT
                         iRow(colName) = ""
                     End If
                 Next
-                'For Each sw In vSwBins
-                '    colName = sw.Name
-                '    iRow(colName) = sw.Count
-                'Next
+
+
+                ''fill SW Bin Site column (Automatic create column)
+                For Each sw In vSwBins
+                    If sw.Sites Is Nothing Then
+                        Continue For
+
+                    End If
+                    For Each st In sw.Sites
+                        colName = st.Name
+                        'Verify Column name exist, if No create new col.
+                        If Not dtEPRO.Columns.Contains(colName) Then
+                            dtEPRO.Columns.Add(colName, GetType(String))
+                        End If
+                        iRow(colName) = st.Count
+                    Next
+
+                Next
 
 
 
