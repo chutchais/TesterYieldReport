@@ -12,6 +12,11 @@ Public Class frmMain
 
         'Dim vObjMAV As New clsMAV("C:\Users\Chutchai\Documents\8oclock\StartsMicro\projects\Tester Yield\Tester logs\MAV\S4UBH310057B_TS00182483.003_F1.txt")
         'Dim vTable As DataTable = vObjMAV.convert_to_datatable
+
+        'Dim     vobjTMT As New clsTMT("C:\Users\Chutchai\Documents\8oclock\StartsMicro\projects\Tester Yield\Tester logs\TMT\S4UBH320071C_TS00182578.004_F5.lsr")
+
+
+
         'Select Tester type EPRO 
         cbTesterType.SelectedIndex = 0
 
@@ -74,6 +79,7 @@ Public Class frmMain
             Case "EPRO" : vFileExt = "*.sum"
             Case "ETS" : vFileExt = "*.txt"
             Case "MAV" : vFileExt = "*.txt"
+            Case "TMT" : vFileExt = "*.lsr"
         End Select
 
         If Not vShortFileName Like vFileExt Then
@@ -93,6 +99,7 @@ Public Class frmMain
             Case "EPRO" : objFile = New clsEPRO(vFileName)
             Case "ETS" : objFile = New clsETS(vFileName)
             Case "MAV" : objFile = New clsMAV(vFileName)
+            Case "TMT" : objFile = New clsTMT(vFileName)
         End Select
 
 
@@ -203,6 +210,7 @@ Public Class frmMain
             Case "EPRO" : vFileExt = "*.sum"
             Case "ETS" : vFileExt = "*.txt"
             Case "MAV" : vFileExt = "*.txt"
+            Case "TMT" : vFileExt = "*.lsr"
         End Select
 
 
@@ -222,6 +230,7 @@ Public Class frmMain
                 Case "EPRO" : objFile = New clsEPRO(file.FullName)
                 Case "ETS" : objFile = New clsETS(file.FullName)
                 Case "MAV" : objFile = New clsMAV(file.FullName)
+                Case "TMT" : objFile = New clsTMT(file.FullName)
             End Select
 
             Dim newItem As ListViewItem = New ListViewItem(file.Name)

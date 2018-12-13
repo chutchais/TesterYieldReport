@@ -76,6 +76,7 @@
     <Compile Include="clsETS.vb" />
     <Compile Include="clsMAV.vb" />
     <Compile Include="clsReport.vb" />
+    <Compile Include="clsTMT.vb" />
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
