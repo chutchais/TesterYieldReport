@@ -50,7 +50,7 @@ Public Class frmMain
 
         Dim versionNumber As Version
         versionNumber = Assembly.GetExecutingAssembly().GetName().Version
-        Me.Text = Me.Text & " version : " & versionNumber.ToString
+        Me.Text = Me.Text & " version : " & versionNumber.ToString & " - .NET framework 3.5"
 
     End Sub
 
